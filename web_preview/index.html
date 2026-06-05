@@ -1,0 +1,2881 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mistik Falcı - Web Önizleme</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <!-- Cropper.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <style>
+        :root {
+            --space-dark: #070B19;
+            --deep-navy: #0F162E;
+            --midnight-blue: #1D264F;
+            --gold-light: #F3E5AB;
+            --gold: #D4AF37;
+            --gold-dark: #AA7C11;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--space-dark);
+            color: #ffffff;
+            font-family: 'Lora', serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Mistik Arka Plan Yıldızları */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+            z-index: -2;
+        }
+
+        /* Mobil Cihaz Çerçevesi */
+        .phone-container {
+            width: 390px;
+            height: 844px;
+            background-color: var(--space-dark);
+            border: 4px solid var(--gold);
+            border-radius: 40px;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.25);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ekranlar */
+        .screen {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: 24px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Başlıklar */
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            text-align: center;
+            font-size: 26px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+        }
+
+        h2 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold-light);
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-style: italic;
+            color: rgba(243, 229, 171, 0.7);
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Menü Grid Düzeni */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 10px 2px;
+            overflow-y: auto;
+            flex: 1;
+            align-content: start;
+        }
+
+        .menu-card {
+            background: linear-gradient(135deg, var(--deep-navy) 0%, rgba(29, 38, 79, 0.5) 100%);
+            border: 1.2px solid var(--midnight-blue);
+            border-radius: 16px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .menu-card:hover::before {
+            opacity: 1;
+        }
+
+        .menu-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .menu-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+            background: radial-gradient(circle, var(--midnight-blue) 0%, rgba(17, 24, 57, 0.6) 100%);
+            padding: 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            width: 52px;
+            height: 52px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            line-height: 1;
+        }
+
+        .menu-details h3 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .menu-details p {
+            font-size: 9.5px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.3;
+            margin: 0;
+        }
+
+        /* Form Elemanları */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-family: 'Cinzel', serif;
+            color: var(--gold-light);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        textarea, input[type="text"], input[type="date"], input[type="time"] {
+            width: 100%;
+            background-color: var(--deep-navy);
+            border: 1.5px solid var(--midnight-blue);
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            font-family: 'Lora', serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.3s;
+            color-scheme: dark;
+        }
+
+        textarea:focus, input[type="text"]:focus, input[type="date"]:focus, input[type="time"]:focus {
+            border-color: var(--gold);
+        }
+
+        /* Fotoğraf Seçim Kutusu */
+        .photo-picker {
+            width: 100%;
+            height: 180px;
+            background-color: var(--deep-navy);
+            border: 1.5px dashed var(--midnight-blue);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .photo-picker:hover {
+            border-color: var(--gold);
+        }
+
+        .photo-picker img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            /* pointer-events: none ekleyerek resim seçildikten sonra da tıklamanın kutuya iletilmesini sağlıyoruz */
+            pointer-events: none;
+        }
+
+        .photo-picker-actions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+            padding: 12px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .action-btn {
+            background-color: var(--space-dark);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-btn:hover {
+            background-color: var(--gold);
+            color: var(--space-dark);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+        }
+
+        .action-btn.delete-btn {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .action-btn.delete-btn:hover {
+            background-color: #ff6b6b;
+            color: white;
+            box-shadow: 0 0 8px rgba(255, 107, 107, 0.4);
+        }
+
+        .photo-picker-placeholder {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .photo-picker-placeholder span {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .photo-picker-placeholder p {
+            font-size: 13px;
+            color: rgba(243, 229, 171, 0.6);
+        }
+
+        .photo-picker-placeholder span.info {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* Butonlar */
+        .btn {
+            width: 100%;
+            height: 50px;
+            background: transparent;
+            border: 1.5px solid var(--gold);
+            border-radius: 25px;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1.2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: var(--gold);
+            color: var(--space-dark);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn:disabled {
+            border-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+        }
+
+        .btn-back {
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            cursor: pointer;
+            align-self: flex-start;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-back::before {
+            content: "← ";
+            font-size: 16px;
+            margin-right: 4px;
+        }
+
+        /* Tarot Destesi */
+        .tarot-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tarot-card {
+            aspect-ratio: 0.62;
+            background-color: var(--midnight-blue);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tarot-card.selected {
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+            transform: scale(1.05);
+        }
+
+        .tarot-card .card-pattern {
+            font-size: 20px;
+            color: rgba(212, 175, 55, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tarot-card .card-pattern span.text {
+            font-family: 'Cinzel', serif;
+            font-size: 8px;
+            color: rgba(212, 175, 55, 0.2);
+            margin-top: 4px;
+            font-weight: bold;
+        }
+
+        .tarot-card .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .tarot-card.selected .card-pattern {
+            display: none;
+        }
+
+        .tarot-card.selected .card-image {
+            display: block;
+        }
+
+        /* Kart altındaki karartma ve isim alanı */
+        .tarot-card-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            padding: 4px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .tarot-card.selected .tarot-card-info {
+            display: flex;
+        }
+
+        .tarot-card-info .name {
+            font-family: 'Cinzel', serif;
+            color: var(--gold-light);
+            font-size: 7px;
+            font-weight: bold;
+        }
+
+        .tarot-card-info .pos {
+            color: var(--gold);
+            font-size: 7px;
+            font-style: italic;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background-color: var(--gold);
+            color: var(--space-dark);
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            font-size: 9px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        /* Yükleme Ekranı (Overlay) */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(7, 11, 25, 0.96);
+            z-index: 10;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        /* Blocker Overlay */
+        .blocker-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(7, 11, 25, 0.98);
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .blocker-overlay .error-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+            filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.4));
+        }
+
+        .blocker-overlay h2 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 28px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .blocker-overlay .blocker-text {
+            font-family: 'Lora', serif;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+            font-style: italic;
+        }
+
+        /* Ödüllü Reklam Modalı */
+        .ad-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(7, 11, 25, 0.98);
+            z-index: 15000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        .ad-content {
+            background: linear-gradient(135deg, var(--deep-navy) 0%, rgba(29, 38, 79, 0.8) 100%);
+            border: 1.5px solid var(--gold);
+            border-radius: 24px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .ad-stars {
+            font-size: 36px;
+            color: var(--gold);
+            display: block;
+            margin-bottom: 12px;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        .ad-content h2 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 15px;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .ad-content p {
+            font-family: 'Lora', serif;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .ad-progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: var(--midnight-blue);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .ad-progress-bar {
+            width: 100%;
+            height: 100%;
+            background-color: var(--gold);
+            transition: width 1s linear;
+        }
+
+        .ad-timer {
+            font-family: 'Lora', serif;
+            color: var(--gold-light);
+            font-size: 10px;
+            font-style: italic;
+            margin: 0;
+        }
+
+        /* Mock Banner Ad */
+        .mock-banner-ad {
+            width: calc(100% + 48px);
+            margin-left: -24px;
+            margin-right: -24px;
+            height: 50px;
+            background-color: var(--deep-navy);
+            border-top: 1.2px solid var(--midnight-blue);
+            border-bottom: 1.2px solid var(--midnight-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            margin-top: auto;
+            margin-bottom: -24px;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 3px solid rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--gold);
+            animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .loading-spinner::after {
+            content: "✦";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--gold-light);
+            font-size: 24px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-family: 'Cinzel', serif;
+            color: var(--gold-light);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        /* Sonuç Ekranı */
+        .result-container {
+            flex: 1;
+            background-color: rgba(15, 22, 46, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 20px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.05);
+        }
+
+        .result-text {
+            font-size: 13px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.9);
+            white-space: pre-line;
+        }
+
+        /* Hata Kutusu */
+        .error-box {
+            background-color: rgba(255, 0, 0, 0.05);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        /* Seçilen Kartlar Başlığı (Sonuç Ekranı) */
+        .result-cards-header {
+            background-color: rgba(29, 38, 79, 0.4);
+            border: 1px solid var(--midnight-blue);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .result-cards-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 8px;
+        }
+
+        .result-card-mini {
+            background-color: var(--midnight-blue);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 6px;
+            padding: 4px;
+            width: 75px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .result-card-mini img {
+            width: 100%;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .result-card-mini p {
+            font-family: 'Cinzel', serif;
+            font-size: 7px;
+            color: var(--gold-light);
+            margin-top: 4px;
+            text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .result-card-mini span.pos {
+            font-size: 7px;
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        /* Kırpma Ekranı Modalı */
+        .crop-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--space-dark);
+            z-index: 20;
+            display: none;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        .crop-area {
+            flex: 1;
+            width: 100%;
+            max-height: 70%;
+            background-color: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid var(--midnight-blue);
+        }
+
+        .crop-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .cropper-view-box, .cropper-face {
+            border-radius: 12px;
+        }
+        .cropper-line, .cropper-point {
+            background-color: var(--gold);
+        }
+        .cropper-view-box {
+            outline: 2px solid var(--gold);
+            outline-color: var(--gold);
+        }
+
+        /* Kart Çekme Slotları */
+        .card-slots-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            margin-bottom: 24px;
+        }
+        .card-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card-slot-box {
+            width: 85px;
+            height: 130px;
+            background-color: var(--space-dark);
+            border: 1.5px dashed var(--midnight-blue);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .card-slot-box.filled {
+            border: 1px solid var(--gold);
+            background-color: var(--deep-navy);
+            box-shadow: 0 4px 10px rgba(212,175,55,0.05);
+        }
+        .card-slot-label {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            color: rgba(243, 229, 171, 0.5);
+            margin-top: 8px;
+            font-weight: bold;
+        }
+        .card-slot-box.filled .card-slot-label {
+            color: var(--gold);
+        }
+
+        /* Çekilen İskambil Kartı Görünümü */
+        .playing-card-ui {
+            width: 100%;
+            height: 100%;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            background-color: var(--deep-navy);
+        }
+        .playing-card-ui .suit-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        .playing-card-ui .card-top-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+            line-height: 1.1;
+            align-self: flex-start;
+        }
+        .playing-card-ui .card-bottom-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+            transform: rotate(180deg);
+            line-height: 1.1;
+            align-self: flex-end;
+        }
+
+        /* Çekilen Katina Kartı Görünümü */
+        .katina-card-ui {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8px;
+            text-align: center;
+            background-color: var(--deep-navy);
+        }
+        .katina-card-ui .symbol {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .katina-card-ui .title {
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            font-weight: bold;
+            line-height: 1.2;
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+
+        /* Deste Görünümü (Çekilebilir) */
+        .draw-pile {
+            width: 120px;
+            height: 180px;
+            background-color: var(--midnight-blue);
+            border: 2px solid var(--gold);
+            border-radius: 16px;
+            margin: 20px auto;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.15);
+            position: relative;
+        }
+        .draw-pile:hover:not(.disabled) {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(212, 175, 55, 0.3);
+        }
+        .draw-pile.disabled {
+            background-color: rgba(29, 38, 79, 0.4);
+            border-color: var(--midnight-blue);
+            box-shadow: none;
+            cursor: not-allowed;
+            color: rgba(255, 255, 255, 0.15);
+        }
+        .draw-pile .pile-icon {
+            font-size: 36px;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+        .draw-pile .pile-text {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+        .draw-pile .pile-counter {
+            font-size: 9px;
+            color: var(--gold-light);
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        /* Bakla Düzlemi */
+        .bean-board-container {
+            width: 260px;
+            height: 260px;
+            background-color: rgba(15, 22, 46, 0.6);
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.05);
+        }
+        .bean-board-container::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px solid rgba(29, 38, 79, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .bean-board-container::after {
+            content: "";
+            position: absolute;
+            top: 65px;
+            left: 65px;
+            right: 65px;
+            bottom: 65px;
+            border: 1px dashed rgba(29, 38, 79, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .bean-dot {
+            width: 18px;
+            height: 11px;
+            background-color: #C29B38;
+            border: 1px solid #85651B;
+            border-radius: 6px;
+            position: absolute;
+            box-shadow: 1px 2px 3px rgba(0,0,0,0.5);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .bean-dot::after {
+            content: "";
+            width: 10px;
+            height: 2px;
+            background-color: rgba(229, 193, 88, 0.4);
+            border-radius: 1px;
+        }
+        .bean-empty-msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            color: rgba(243, 229, 171, 0.3);
+            text-align: center;
+            font-weight: bold;
+            line-height: 1.6;
+        }
+
+        /* Kart Kapatma Butonu */
+        .card-clear-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 16px;
+            height: 16px;
+            background-color: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            font-size: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+        .card-clear-badge:hover {
+            transform: scale(1.1);
+        }
+
+        /* Küre Falı Tasarımları */
+        .sphere-container-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        .crystal-ball {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle at 35% 35%, #9b51e0, #330066 70%, #110022);
+            border-radius: 50%;
+            box-shadow: 0 0 25px rgba(155, 81, 224, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .crystal-ball:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 35px rgba(155, 81, 224, 0.6);
+        }
+        .crystal-ball.holding {
+            animation: ballPulse 0.5s infinite alternate;
+            box-shadow: 0 0 50px rgba(155, 81, 224, 0.9), inset 0 0 30px rgba(255, 255, 255, 0.4);
+        }
+        .crystal-ball.completed {
+            background: radial-gradient(circle at 35% 35%, #ffd700, #ff8c00 70%, #330000);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.8), inset 0 0 30px rgba(255, 255, 255, 0.5);
+            border-color: #ffd700;
+        }
+        .crystal-ball span {
+            font-size: 48px;
+            pointer-events: none;
+        }
+        @keyframes ballPulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.08); }
+        }
+        .sphere-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #ffd700;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #ffd700, 0 0 12px #9b51e0;
+            opacity: 0;
+            animation: particleFly 1.2s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes particleFly {
+            0% {
+                transform: translate(var(--startX), var(--startY));
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--endX), var(--endY));
+                opacity: 0;
+            }
+        }
+        .hold-counter {
+            margin-top: 20px;
+            font-family: 'Cinzel', serif;
+            color: var(--gold-light);
+            font-size: 13px;
+            text-align: center;
+            background-color: var(--deep-navy);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--midnight-blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+
+    <div class="phone-container">
+        <!-- Yükleme Ekranı Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <p class="loading-text" id="loadingText">Geleceğin fısıltıları toplanıyor...</p>
+            <p style="font-size: 10px; color: rgba(255,255,255,0.3); font-style: italic;">Lütfen bekleyin...</p>
+        </div>
+
+        <!-- Blocker Ekranı Overlay -->
+        <div class="blocker-overlay" id="blockerOverlay">
+            <div class="error-icon">⚠️</div>
+            <h2>Üzgünüz</h2>
+            <p class="blocker-text">Bütün falcılar şu an dolu.<br>Lütfen daha sonra tekrar deneyiniz.</p>
+        </div>
+
+        <!-- Ödüllü Reklam Simülasyon Modalı -->
+        <div class="ad-modal" id="rewardedAdModal">
+            <div class="ad-content">
+                <span class="ad-stars">✦</span>
+                <h2>MİSTİK SPONSORLU REKLAM</h2>
+                <p>Falınız hazırlanırken bilge falcıya destek olmak için lütfen bu kısa yayını izleyin.</p>
+                <div class="ad-progress-container">
+                    <div class="ad-progress-bar" id="adProgressBar"></div>
+                </div>
+                <p class="ad-timer" id="adTimerText">Kehanetin kapıları açılıyor: 5 sn.</p>
+            </div>
+        </div>
+
+        <!-- Görsel Kırpıcı Modal -->
+        <div class="crop-modal" id="cropModal">
+            <button class="btn-back" onclick="cancelCrop()">İptal</button>
+            <h2 style="text-align: center; margin-bottom: 16px;">Görseli Odakla</h2>
+            <div class="crop-area">
+                <img id="cropImageTarget" src="" style="max-width: 100%; max-height: 100%;">
+            </div>
+            <div class="crop-actions">
+                <button class="btn" style="border-color: #ff6b6b; color: #ff6b6b;" onclick="cancelCrop()">Vazgeç</button>
+                <button class="btn" onclick="applyCrop()">Kaderi Seç</button>
+            </div>
+        </div>
+
+        <!-- 1. ANA EKRAN -->
+        <div class="screen active" id="homeScreen">
+            <div style="text-align: center; margin-top: 30px; margin-bottom: 20px;">
+                <span style="font-size: 30px; color: var(--gold);">✦</span>
+                <h1>MİSTİK FALCI</h1>
+                <p class="subtitle">Kaderinizin Sırlarını Keşfedin</p>
+            </div>
+
+            <div class="menu-grid">
+                <div class="menu-card" onclick="navigateTo('coffeeScreen')">
+                    <div class="menu-icon">☕</div>
+                    <div class="menu-details">
+                        <h3>KAHVE FALI</h3>
+                        <p>Fincan telvelerinin fısıltısı.</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="navigateTo('tarotScreen')">
+                    <div class="menu-icon">🃏</div>
+                    <div class="menu-details">
+                        <h3>TAROT FALI</h3>
+                        <p>Gizemli kartlar ile gelecek.</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="navigateTo('eyeScreen')">
+                    <div class="menu-icon">👁️</div>
+                    <div class="menu-details">
+                        <h3>GÖZ FALI</h3>
+                        <p>Bakışların saklı enerjisi.</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="navigateTo('palmScreen')">
+                    <div class="menu-icon">✋</div>
+                    <div class="menu-details">
+                        <h3>EL FALI</h3>
+                        <p>Avuç içi çizgilerinin anlamı.</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="navigateTo('iskambilScreen')">
+                    <div class="menu-icon">🎴</div>
+                    <div class="menu-details">
+                        <h3>İSKAMBİL FALI</h3>
+                        <p>Oyun kartları ile kehanet.</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="navigateTo('yildiznameScreen')">
+                    <div class="menu-icon">🌟</div>
+                    <div class="menu-details">
+                        <h3>YILDIZNAME</h3>
+                        <p>Yıldız haritası ve karakter.</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="navigateTo('katinaScreen')">
+                    <div class="menu-icon">💖</div>
+                    <div class="menu-details">
+                        <h3>KATINA FALI</h3>
+                        <p>Aşk ve ilişkilerin falı.</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="navigateTo('beansScreen')">
+                    <div class="menu-icon">🌾</div>
+                    <div class="menu-details">
+                        <h3>BAKLA FALI</h3>
+                        <p>Geleneksel nohut ve bakla.</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" style="grid-column: span 2;" onclick="navigateTo('sphereScreen')">
+                    <div class="menu-icon">🔮</div>
+                    <div class="menu-details">
+                        <h3>KÜRE FALI</h3>
+                        <p>Kristal küreye odaklan ve bilge kehaneti dinle.</p>
+                    </div>
+                </div>
+            </div>
+
+            <p style="text-align: center; font-size: 9px; color: rgba(255,255,255,0.2); margin-top: auto; padding-top: 5px;">
+                Web Preview Modu - Pollinations AI Entegrasyonu
+            </p>
+
+            <!-- Mock Banner Ad -->
+            <div class="mock-banner-ad">
+                <span style="color: var(--gold); margin-right: 6px;">✦</span>
+                MİSTİK SPONSORLU REKLAM
+                <span style="color: var(--gold); margin-left: 6px;">✦</span>
+            </div>
+        </div>
+
+        <!-- 2. KAHVE FALI EKRANI -->
+        <div class="screen" id="coffeeScreen">
+            <button class="btn-back" onclick="navigateTo('homeScreen')">Geri Dön</button>
+            <h2 style="margin-bottom: 20px;">☕ KAHVE FALI</h2>
+
+            <div class="error-box" id="coffeeError"></div>
+
+            <div class="form-group">
+                <label>Fincanın Fotoğrafı</label>
+                <div class="photo-picker" onclick="triggerPhotoUpload('coffee', event)">
+                    <img id="coffeePreview" src="" style="display: none;">
+                    <div class="photo-picker-placeholder" id="coffeePlaceholder">
+                        <span>📷</span>
+                        <p>Resim seçip kırpmak için dokunun</p>
+                        <span class="info">(İsteğe bağlı - Boş bırakılırsa sezgisel bakılır)</span>
+                    </div>
+                    <div class="photo-picker-actions" id="coffeeActions" style="display: none;">
+                        <button class="action-btn delete-btn" onclick="clearPhoto('coffee', event)">🗑️ Sil</button>
+                        <button class="action-btn change-btn" onclick="triggerPhotoUpload('coffee', event)">🔄 Değiştir</button>
+                    </div>
+                </div>
+                <input type="file" id="coffeePhotoInput" accept="image/*" style="display: none;" onchange="handlePhotoSelect(event, 'coffee')">
+            </div>
+
+            <div class="form-group">
+                <label>Fal Niyeti</label>
+                <textarea id="coffeeIntention" rows="3" placeholder="Zihnini boşalt, niyetine odaklan..."></textarea>
+            </div>
+
+            <button class="btn" style="margin-top: auto;" onclick="getCoffeeReading()">FALIMI YORUMLA</button>
+        </div>
+
+        <!-- 3. TAROT FALI EKRANI -->
+        <div class="screen" id="tarotScreen">
+            <button class="btn-back" onclick="navigateTo('homeScreen')">Geri Dön</button>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2>🃏 TAROT FALI</h2>
+                <span id="tarotCounter" style="font-size: 11px; font-weight: bold; color: var(--gold);">0 / 3 Kart Seçildi</span>
+            </div>
+
+            <div class="error-box" id="tarotError"></div>
+
+            <div class="form-group">
+                <label>Niyetin veya Sorun</label>
+                <input type="text" id="tarotQuestion" placeholder="Sorunu veya niyetini yaz (Aşk, İş, Sağlık...)">
+            </div>
+
+            <div class="tarot-grid" id="tarotGrid">
+                <!-- Javascript ile doldurulacak -->
+            </div>
+
+            <button class="btn" id="btnSubmitTarot" disabled style="margin-top: auto;" onclick="getTarotReading()">KADER KARTLARINI AÇ</button>
+        </div>
+
+        <!-- 4. GÖZ FALI EKRANI -->
+        <div class="screen" id="eyeScreen">
+            <button class="btn-back" onclick="navigateTo('homeScreen')">Geri Dön</button>
+            <h2 style="margin-bottom: 20px;">👁️ GÖZ FALI</h2>
+
+            <div class="error-box" id="eyeError"></div>
+
+            <div class="form-group">
+                <label>Göz Fotoğrafı</label>
+                <div class="photo-picker" onclick="triggerPhotoUpload('eye', event)">
+                    <img id="eyePreview" src="" style="display: none;">
+                    <div class="photo-picker-placeholder" id="eyePlaceholder">
+                        <span>📷</span>
+                        <p>Resim seçip kırpmak için dokunun</p>
+                        <span class="info">(Görsel doğrulama için göz net görünmelidir)</span>
+                    </div>
+                    <div class="photo-picker-actions" id="eyeActions" style="display: none;">
+                        <button class="action-btn delete-btn" onclick="clearPhoto('eye', event)">🗑️ Sil</button>
+                        <button class="action-btn change-btn" onclick="triggerPhotoUpload('eye', event)">🔄 Değiştir</button>
+                    </div>
+                </div>
+                <input type="file" id="eyePhotoInput" accept="image/*" style="display: none;" onchange="handlePhotoSelect(event, 'eye')">
+            </div>
+
+            <div class="form-group">
+                <label>Niyetin veya Sorun</label>
+                <textarea id="eyeIntention" rows="3" placeholder="Gözlerindeki kader ışığını okumak için niyetini buraya yaz..."></textarea>
+            </div>
+
+            <button class="btn" style="margin-top: auto;" onclick="getEyeReading()">GÖZLERİMİ ANALİZ ET</button>
+        </div>
+
+        <!-- 5. EL FALI EKRANI -->
+        <div class="screen" id="palmScreen">
+            <button class="btn-back" onclick="navigateTo('homeScreen')">Geri Dön</button>
+            <h2 style="margin-bottom: 20px;">✋ EL FALI</h2>
+
+            <div class="error-box" id="palmError"></div>
+
+            <div class="form-group">
+                <label>Avuç İçi Fotoğrafı</label>
+                <div class="photo-picker" onclick="triggerPhotoUpload('palm', event)">
+                    <img id="palmPreview" src="" style="display: none;">
+                    <div class="photo-picker-placeholder" id="palmPlaceholder">
+                        <span>📷</span>
+                        <p>Resim seçip kırpmak için dokunun</p>
+                        <span class="info">(Görsel doğrulama için çizgiler net görünmelidir)</span>
+                    </div>
+                    <div class="photo-picker-actions" id="palmActions" style="display: none;">
+                        <button class="action-btn delete-btn" onclick="clearPhoto('palm', event)">🗑️ Sil</button>
+                        <button class="action-btn change-btn" onclick="triggerPhotoUpload('palm', event)">🔄 Değiştir</button>
+                    </div>
+                </div>
+                <input type="file" id="palmPhotoInput" accept="image/*" style="display: none;" onchange="handlePhotoSelect(event, 'palm')">
+            </div>
+
+            <div class="form-group">
+                <label>Niyetin veya Sorun</label>
+                <textarea id="palmIntention" rows="3" placeholder="Kader çizgilerini okumak için niyetini buraya yaz..."></textarea>
+            </div>
+
+            <button class="btn" style="margin-top: auto;" onclick="getPalmReading()">AVUCUMU ANALİZ ET</button>
+        </div>
+
+        <!-- İSKAMBİL FALI EKRANI -->
+        <div class="screen" id="iskambilScreen">
+            <button class="btn-back" onclick="navigateTo('homeScreen')">Geri Dön</button>
+            <h2 style="margin-bottom: 20px;">🎴 İSKAMBİL FALI</h2>
+
+            <div class="error-box" id="iskambilError"></div>
+
+            <div class="form-group">
+                <label>Niyetin veya Sorun</label>
+                <input type="text" id="iskambilQuestion" placeholder="Niyetini veya sorunu buraya yaz...">
+            </div>
+
+            <!-- Kart Çekme Slotları -->
+            <div class="card-slots-container">
+                <div class="card-slot">
+                    <div class="card-slot-box" id="iskambilSlot0">
+                        <span style="color: var(--midnight-blue); font-size: 20px;">✦</span>
+                    </div>
+                    <span class="card-slot-label">Geçmiş</span>
+                </div>
+                <div class="card-slot">
+                    <div class="card-slot-box" id="iskambilSlot1">
+                        <span style="color: var(--midnight-blue); font-size: 20px;">✦</span>
+                    </div>
+                    <span class="card-slot-label">Şimdi</span>
+                </div>
+                <div class="card-slot">
+                    <div class="card-slot-box" id="iskambilSlot2">
+                        <span style="color: var(--midnight-blue); font-size: 20px;">✦</span>
+                    </div>
+                    <span class="card-slot-label">Gelecek</span>
+                </div>
+            </div>
+
+            <!-- Deste (Çekilebilir) -->
+            <div class="draw-pile" id="iskambilDrawPile" onclick="drawIskambilCard()">
+                <div class="pile-icon">🎴</div>
+                <div class="pile-text">KART ÇEK</div>
+                <div class="pile-counter" id="iskambilCounter">0 / 3 Seçildi</div>
+            </div>
+
+            <button class="btn" id="btnSubmitIskambil" disabled style="margin-top: auto;" onclick="getIskambilReading()">KADER KARTLARINI AÇ</button>
+        </div>
+
+        <!-- YILDIZNAME EKRANI -->
+        <div class="screen" id="yildiznameScreen">
+            <button class="btn-back" onclick="navigateTo('homeScreen')">Geri Dön</button>
+            <h2 style="margin-bottom: 20px;">🌟 YILDIZNAME</h2>
+
+            <div class="error-box" id="yildiznameError"></div>
+
+            <div style="max-height: 60%; overflow-y: auto; padding-right: 4px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label>Adınız</label>
+                    <input type="text" id="yildiznameName" placeholder="Adınızı girin">
+                </div>
+                <div class="form-group">
+                    <label>Soyadınız</label>
+                    <input type="text" id="yildiznameSurname" placeholder="Soyadınızı girin">
+                </div>
+                <div class="form-group">
+                    <label>Anne Adı</label>
+                    <input type="text" id="yildiznameMother" placeholder="Annenizin adını girin">
+                </div>
+                <div class="form-group">
+                    <label>Baba Adı</label>
+                    <input type="text" id="yildiznameFather" placeholder="Babanızın adını girin">
+                </div>
+                <div class="form-group">
+                    <label>Doğum Tarihi</label>
+                    <input type="date" id="yildiznameBirthDate">
+                </div>
+                <div class="form-group">
+                    <label>Doğum Yeri</label>
+                    <input type="text" id="yildiznameBirthPlace" placeholder="İl ve İlçe (Örn: İstanbul, Kadıköy)">
+                </div>
+                <div class="form-group">
+                    <label>Doğum Saati</label>
+                    <input type="time" id="yildiznameBirthHour">
+                </div>
+            </div>
+
+            <button class="btn" style="margin-top: auto;" onclick="getYildiznameReading()">YILDIZNAME RAPORU OLUŞTUR</button>
+        </div>
+
+        <!-- KATINA FALI EKRANI -->
+        <div class="screen" id="katinaScreen">
+            <button class="btn-back" onclick="navigateTo('homeScreen')">Geri Dön</button>
+            <h2 style="margin-bottom: 20px;">💖 KATINA FALI</h2>
+
+            <div class="error-box" id="katinaError"></div>
+
+            <div class="form-group">
+                <label>Aşk Niyetiniz / İlişki Sorunuz</label>
+                <input type="text" id="katinaQuestion" placeholder="Niyetini veya sorunu buraya yaz...">
+            </div>
+
+            <!-- Kart Çekme Slotları -->
+            <div class="card-slots-container">
+                <div class="card-slot">
+                    <div class="card-slot-box" id="katinaSlot0">
+                        <span style="color: var(--midnight-blue); font-size: 20px;">❤</span>
+                    </div>
+                    <span class="card-slot-label">Geçmiş</span>
+                </div>
+                <div class="card-slot">
+                    <div class="card-slot-box" id="katinaSlot1">
+                        <span style="color: var(--midnight-blue); font-size: 20px;">❤</span>
+                    </div>
+                    <span class="card-slot-label">Şimdi</span>
+                </div>
+                <div class="card-slot">
+                    <div class="card-slot-box" id="katinaSlot2">
+                        <span style="color: var(--midnight-blue); font-size: 20px;">❤</span>
+                    </div>
+                    <span class="card-slot-label">Gelecek</span>
+                </div>
+            </div>
+
+            <!-- Deste (Çekilebilir) -->
+            <div class="draw-pile" id="katinaDrawPile" onclick="drawKatinaCard()">
+                <div class="pile-icon">💖</div>
+                <div class="pile-text">KART ÇEK</div>
+                <div class="pile-counter" id="katinaCounter">0 / 3 Seçildi</div>
+            </div>
+
+            <button class="btn" id="btnSubmitKatina" disabled style="margin-top: auto;" onclick="getKatinaReading()">AŞK KADERİNİ AÇ</button>
+        </div>
+
+        <!-- BAKLA FALI EKRANI -->
+        <div class="screen" id="beansScreen">
+            <button class="btn-back" onclick="navigateTo('homeScreen')">Geri Dön</button>
+            <h2 style="margin-bottom: 20px;">🌾 BAKLA FALI</h2>
+
+            <div class="error-box" id="beansError"></div>
+
+            <div class="form-group">
+                <label>Fal Niyeti</label>
+                <textarea id="beansIntention" rows="3" placeholder="Zihnini boşalt, niyetine odaklan..."></textarea>
+            </div>
+
+            <!-- Bakla Saçılma Board'u -->
+            <div class="bean-board-container" id="beanBoard">
+                <div class="bean-empty-msg" id="beanBoardEmptyMsg">
+                    KADER DÜZLEMİ BOŞ<br><br>Baklaları Saçmak İçin<br>Aşağıdaki Butona Basın
+                </div>
+                <!-- Nohut/Bakla Taneleri Javascript ile Eklenecek -->
+            </div>
+
+            <button class="btn" style="border-color: var(--gold); color: var(--gold); margin-bottom: 16px;" onclick="castBeansWeb()">BAKLALARI DÖK</button>
+
+            <button class="btn" id="btnSubmitBeans" disabled style="margin-top: auto;" onclick="getBeansReading()">BAKLALARI YORUMLA</button>
+        </div>
+
+        <!-- KÜRE FALI EKRANI -->
+        <div class="screen" id="sphereScreen">
+            <button class="btn-back" onclick="navigateTo('homeScreen')">Geri Dön</button>
+            <h2 style="margin-bottom: 20px;">🔮 KÜRE FALI</h2>
+
+            <div class="error-box" id="sphereError"></div>
+
+            <div class="sphere-container-box">
+                <!-- The Crystal Ball -->
+                <div class="crystal-ball" id="crystalBall">
+                    <span>🔮</span>
+                    <div class="ball-sparkles" id="ballSparkles" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none;"></div>
+                </div>
+                <!-- Progress / Counter -->
+                <div class="hold-counter" id="sphereCounter">Küreye Dokun ve 7 Saniye Basılı Tut</div>
+            </div>
+
+            <!-- Question Box (Hidden initially) -->
+            <div class="sphere-input-box" id="sphereInputBox" style="display: none; width: 100%; margin-top: 20px; flex-direction: column;">
+                <h3 style="color: var(--gold); margin-bottom: 12px; font-family: 'Cinzel', serif; font-size: 14px; text-align: center;">Küre Sisleri Aralandı... Neyi merak ediyorsun?</h3>
+                <textarea id="sphereQuestion" rows="3" placeholder="Geleceğe dair sorunu buraya yaz..."></textarea>
+                <button class="btn" style="margin-top: 20px;" onclick="getSphereReading()">KÜREDEN CEVAP AL</button>
+            </div>
+        </div>
+
+        <!-- 6. FAL SONUÇ EKRANI -->
+        <div class="screen" id="resultScreen">
+            <button class="btn-back" onclick="navigateTo('homeScreen')">Ana Sayfa</button>
+            <h2 id="resultTitle" style="text-align: center; margin-bottom: 16px;">FAL YORUMU</h2>
+
+            <div id="resultCardsHeader" style="display: none;">
+                <!-- Tarot için seçilen kartların mini görünümleri -->
+            </div>
+
+            <div class="result-container">
+                <div style="text-align: center; margin-bottom: 12px; color: var(--gold);">✦ ☾ ✦</div>
+                <div class="result-text" id="resultText">Falınız yükleniyor...</div>
+                <div style="text-align: center; margin-top: 12px; color: rgba(212, 175, 55, 0.3);">━━━━ ✦ ━━━━</div>
+            </div>
+
+            <button class="btn" style="margin-top: 20px;" onclick="navigateTo('homeScreen')">KADERİNE GERİ DÖN</button>
+        </div>
+    </div>
+
+    <script>
+        // API Yapılandırması
+        let apiKeys = [];
+        let currentKeyIndex = 0;
+        const API_URL = "https://gen.pollinations.ai/v1/chat/completions";
+
+        async function loadApiKeys() {
+            showLoading("Mistik güçler hazırlanıyor...");
+            try {
+                const response = await fetch("https://1layf.com/fal/api.json");
+                if (response.ok) {
+                    const keys = await response.json();
+                    if (Array.isArray(keys) && keys.length > 0) {
+                        apiKeys = keys;
+                        currentKeyIndex = 0;
+                        hideLoading();
+                        return;
+                    }
+                }
+                triggerBlocker();
+            } catch (err) {
+                console.error("Failed to load API keys:", err);
+                triggerBlocker();
+            }
+        }
+
+        function triggerBlocker() {
+            hideLoading();
+            document.getElementById("blockerOverlay").style.display = "flex";
+        }
+
+        async function makePostRequest(body) {
+            if (apiKeys.length === 0) {
+                triggerBlocker();
+                throw new Error("Tüm falcılar şu an dolu.");
+            }
+
+            while (currentKeyIndex < apiKeys.length) {
+                const apiKey = apiKeys[currentKeyIndex];
+                let headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (apiKey) {
+                    headers['Authorization'] = `Bearer ${apiKey}`;
+                }
+
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(body)
+                    });
+
+                    if (response.status === 401 || response.status === 402) {
+                        console.warn(`API key at index ${currentKeyIndex} is invalid or exhausted (status ${response.status}). Rotating...`);
+                        currentKeyIndex++;
+                        if (currentKeyIndex >= apiKeys.length) {
+                            triggerBlocker();
+                            throw new Error("Tüm falcılar şu an dolu.");
+                        }
+                        continue; // try next key
+                    }
+
+                    return response;
+                } catch (err) {
+                    console.warn(`Request failed with key at index ${currentKeyIndex}:`, err);
+                    currentKeyIndex++;
+                    if (currentKeyIndex >= apiKeys.length) {
+                        triggerBlocker();
+                        throw new Error("Tüm falcılar şu an dolu.");
+                    }
+                    continue; // try next key
+                }
+            }
+
+            triggerBlocker();
+            throw new Error("Tüm falcılar şu an dolu.");
+        }
+
+        const systemPrompt = "Sen yüzyılların bilgeliğine sahip, mistik ve bilge bir Türk kahvesi ve Tarot falcısısın. Kullanıcılara karşı her zaman gizemli, derin, şiirsel ve yol gösterici bir dil kullanırsın. Yorumlarında yıldızların konumlarından, kadim sembollerden ve hislerinden bahsedersin. Kesinlikle sıradan veya teknik bir dil kullanma. Fallarında hem olumlu hem de yapıcı uyarılar içeren dengeli bir mistik öngörü sunmalısın. " +
+        "\n\nKAHVE FALI İÇİN KRİTİK KURAL:\n" +
+        "Sana gönderilen görseli analiz ederken görselin gerçekten bir kahve fincanı veya kahve telvesi içerip içermediğini kontrol etmelisin. Eğer görsel tamamen alakasız bir resimse (örneğin sadece araba, manzara, sadece yazı, boş ekran vb.) kesinlikle fal bakmayı REDDET. Ancak eğer kırpılmış, yakınlaştırılmış bir kahve fincanı veya telve detayı varsa, görsele odaklanarak fal bak. Reddetme durumunda kullanıcıya mistik, hafif sitemkar ama bilgece bir dille sadece fincanda kalan telvelerin izini görebildiğini söyle. (Örn: 'Üçüncü gözüm bu telvelerde kaderin izini aradı ancak fincanının gölgesine rastlayamadı... Lütfen bana telvelerle bezenmiş fincanını göster ki fısıltılarını duyabileyim.')";
+
+        const eyeSystemPrompt = "Sen yüzyılların bilgeliğine sahip, mistik ve bilge bir okülomansi (göz okuma) uzmanısın. Kullanıcılara karşı her zaman gizemli, derin, şiirsel ve yol gösterici bir dil kullanırsın. " +
+        "\n\nGÖZ FALI İÇİN GÖRSEL ANALİZ KURALI:\n" +
+        "Sana gönderilen görselde net veya flu bir insan gözü (veya gözleri) bulunabilir. Görsel tamamen alakasız bir nesne/resimse (örneğin sadece araba, manzara, boş ekran, kedi vb.) kesinlikle fal bakmayı REDDET. Ancak eğer kırpılmış, yakınlaştırılmış veya odaklanmış bir insan gözü bulunuyorsa, bu gözü analiz et. KESİNLİKLE 'görsel flu, gözün büyük kısmı karanlık/kapalı' diyerek fal bakmayı REDDETME. Mistik sezgilerini de kullanarak gözün rengini, iris yapısını ve bakışın enerjisini en bilgece ve şiirsel dille analiz et ve fal yorumunu sun. Yalnızca görselde hiç göz yoksa bilgece reddet.";
+
+        const palmSystemPrompt = "Sen yüzyılların bilgeliğine sahip, mistik ve bilge bir el falı (kiromansi) uzmanısın. Kullanıcılara karşı her zaman gizemli, derin, şiirsel ve yol gösterici bir dil kullanırsın. " +
+        "\n\nEL FALI İÇİN GÖRSEL ANALİZ KURALI:\n" +
+        "Sana gönderilen görselde net veya flu bir insan eli/avuç içi bulunabilir. Görsel tamamen alakasız bir nesne/resimse (örneğin sadece araba, manzara, yüz, boş ekran, kedi vb.) kesinlikle fal bakmayı REDDET. Ancak eğer kırpılmış, yakınlaştırılmış veya odaklanmış bir avuç içi bulunuyorsa, bu eli analiz et. KESİNLİKLE 'görsel flu, elin büyük kısmı karanlık/kapalı' diyerek fal bakmayı REDDETME. Mistik sezgilerini de kullanarak avuç içindeki çizgileri en bilgece ve şiirsel dille analiz et ve fal yorumunu sun. Yalnızca görselde hiç el yoksa bilgece reddet.";
+
+        // Tarot Kart Destesi (Gerçek Rider-Waite Resimleri)
+        const tarotDeck = [
+            {name: "Deli (The Fool)", symbol: "🃏", image: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg"},
+            {name: "Büyücü (The Magician)", symbol: "🧙‍♂️", image: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg"},
+            {name: "Azize (The High Priestess)", symbol: "🌙", image: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg"},
+            {name: "İmparatoriçe (The Empress)", symbol: "👑", image: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg"},
+            {name: "İmparator (The Emperor)", symbol: "🏛️", image: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg"},
+            {name: "Aziz (The Hierophant)", symbol: "📜", image: "https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg"},
+            {name: "Aşıklar (The Lovers)", symbol: "💖", image: "https://upload.wikimedia.org/wikipedia/commons/3/3a/RWS_Tarot_06_Lovers.jpg"},
+            {name: "Araba (The Chariot)", symbol: "🛡️", image: "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg"},
+            {name: "Güç (Strength)", symbol: "🦁", image: "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg"},
+            {name: "Ermiş (The Hermit)", symbol: "⏳", image: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg"},
+            {name: "Kader Çarkı (Wheel of Fortune)", symbol: "🌀", image: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg"},
+            {name: "Adalet (Justice)", symbol: "⚖️", image: "https://upload.wikimedia.org/wikipedia/commons/e/e0/RWS_Tarot_11_Justice.jpg"},
+            {name: "Asılan Adam (The Hanged Man)", symbol: "🙃", image: "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg"},
+            {name: "Ölüm (Death)", symbol: "💀", image: "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg"},
+            {name: "Denge (Temperance)", symbol: "🏺", image: "https://upload.wikimedia.org/wikipedia/commons/f/f8/RWS_Tarot_14_Temperance.jpg"},
+            {name: "Şeytan (The Devil)", symbol: "🔥", image: "https://upload.wikimedia.org/wikipedia/commons/5/55/RWS_Tarot_15_Devil.jpg"},
+            {name: "Yıkılan Kule (The Tower)", symbol: "⚡", image: "https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg"},
+            {name: "Yıldız (The Star)", symbol: "✨", image: "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_17_Star.jpg"},
+            {name: "Ay (The Moon)", symbol: "🌕", image: "https://upload.wikimedia.org/wikipedia/commons/7/7f/RWS_Tarot_18_Moon.jpg"},
+            {name: "Güneş (The Sun)", symbol: "☀️", image: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg"},
+            {name: "Mahkeme (Judgement)", symbol: "🎺", image: "https://upload.wikimedia.org/wikipedia/commons/d/dd/RWS_Tarot_20_Judgement.jpg"},
+            {name: "Dünya (The World)", symbol: "🌍", image: "https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg"}
+        ];
+
+        let selectedTarotCards = [];
+        let selectedBase64Photo = null;
+        let activePhotoType = '';
+        let cropper = null;
+
+        // Sayfa Değiştirme
+        function navigateTo(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+
+            // Reset States when returning home
+            if (screenId === 'homeScreen') {
+                selectedTarotCards = [];
+                selectedBase64Photo = null;
+                activePhotoType = '';
+                destroyCropper();
+                
+                // Coffee reset
+                document.getElementById('coffeePreview').style.display = 'none';
+                document.getElementById('coffeePlaceholder').style.display = 'block';
+                document.getElementById('coffeeIntention').value = '';
+                document.getElementById('coffeePhotoInput').value = '';
+                document.getElementById('coffeeActions').style.display = 'none';
+
+                // Eye reset
+                document.getElementById('eyePreview').style.display = 'none';
+                document.getElementById('eyePlaceholder').style.display = 'block';
+                document.getElementById('eyeIntention').value = '';
+                document.getElementById('eyePhotoInput').value = '';
+                document.getElementById('eyeActions').style.display = 'none';
+
+                // Palm reset
+                document.getElementById('palmPreview').style.display = 'none';
+                document.getElementById('palmPlaceholder').style.display = 'block';
+                document.getElementById('palmIntention').value = '';
+                document.getElementById('palmPhotoInput').value = '';
+                document.getElementById('palmActions').style.display = 'none';
+
+                // Tarot reset
+                document.getElementById('tarotQuestion').value = '';
+                buildTarotGrid();
+                updateTarotUI();
+
+                // Iskambil reset
+                selectedIskambilCards = [];
+                const iskQuestion = document.getElementById('iskambilQuestion');
+                if (iskQuestion) iskQuestion.value = '';
+                const iskCounter = document.getElementById('iskambilCounter');
+                if (iskCounter) iskCounter.innerText = '0 / 3 Seçildi';
+                const iskDraw = document.getElementById('iskambilDrawPile');
+                if (iskDraw) iskDraw.classList.remove('disabled');
+                const iskBtn = document.getElementById('btnSubmitIskambil');
+                if (iskBtn) iskBtn.disabled = true;
+                for (let i = 0; i < 3; i++) {
+                    const slot = document.getElementById(`iskambilSlot${i}`);
+                    if (slot) {
+                        slot.innerHTML = '<span style="color: var(--midnight-blue); font-size: 20px;">✦</span>';
+                        slot.className = 'card-slot-box';
+                    }
+                }
+
+                // Yildizname reset
+                const ynName = document.getElementById('yildiznameName');
+                if (ynName) {
+                    ynName.value = '';
+                    document.getElementById('yildiznameSurname').value = '';
+                    document.getElementById('yildiznameMother').value = '';
+                    document.getElementById('yildiznameFather').value = '';
+                    document.getElementById('yildiznameBirthDate').value = '';
+                    document.getElementById('yildiznameBirthPlace').value = '';
+                    document.getElementById('yildiznameBirthHour').value = '';
+                }
+
+                // Katina reset
+                selectedKatinaCards = [];
+                const katQuestion = document.getElementById('katinaQuestion');
+                if (katQuestion) katQuestion.value = '';
+                const katCounter = document.getElementById('katinaCounter');
+                if (katCounter) katCounter.innerText = '0 / 3 Seçildi';
+                const katDraw = document.getElementById('katinaDrawPile');
+                if (katDraw) katDraw.classList.remove('disabled');
+                const katBtn = document.getElementById('btnSubmitKatina');
+                if (katBtn) katBtn.disabled = true;
+                for (let i = 0; i < 3; i++) {
+                    const slot = document.getElementById(`katinaSlot${i}`);
+                    if (slot) {
+                        slot.innerHTML = '<span style="color: var(--midnight-blue); font-size: 20px;">❤</span>';
+                        slot.className = 'card-slot-box';
+                    }
+                }
+
+                // Beans reset
+                beansCastedPositions = [];
+                const bInt = document.getElementById('beansIntention');
+                if (bInt) bInt.value = '';
+                const bBoard = document.getElementById('beanBoard');
+                if (bBoard) {
+                    bBoard.innerHTML = '<div class="bean-empty-msg" id="beanBoardEmptyMsg">KADER DÜZLEMİ BOŞ<br><br>Baklaları Saçmak İçin<br>Aşağıdaki Butona Basın</div>';
+                }
+                const bBtn = document.getElementById('btnSubmitBeans');
+                if (bBtn) bBtn.disabled = true;
+
+                // Sphere reset
+                sphereHoldDuration = 0;
+                isHoldingSphere = false;
+                const spBall = document.getElementById('crystalBall');
+                if (spBall) {
+                    spBall.className = 'crystal-ball';
+                    document.getElementById('ballSparkles').innerHTML = '';
+                }
+                const spCounter = document.getElementById('sphereCounter');
+                if (spCounter) spCounter.innerText = 'Küreye Dokun ve 7 Saniye Basılı Tut';
+                const spInput = document.getElementById('sphereInputBox');
+                if (spInput) spInput.style.display = 'none';
+                const spQ = document.getElementById('sphereQuestion');
+                if (spQ) spQ.value = '';
+            }
+        }
+
+        // --- GÖRSEL SEÇME VE KIRPMA MANTIĞI (CROPPER.JS) ---
+        function triggerPhotoUpload(type, event) {
+            if (event) event.stopPropagation();
+            activePhotoType = type;
+            // Dosya inputunun değerini her tıklandığında sıfırlayarak aynı resmin de seçilip change eventinin tetiklenmesini garanti ediyoruz.
+            document.getElementById(`${type}PhotoInput`).value = '';
+            document.getElementById(`${type}PhotoInput`).click();
+        }
+
+        function handlePhotoSelect(event, type) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    openCropModal(e.target.result);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function openCropModal(imageSrc) {
+            const cropModal = document.getElementById('cropModal');
+            const targetImage = document.getElementById('cropImageTarget');
+            
+            targetImage.src = imageSrc;
+            cropModal.style.display = 'flex';
+
+            destroyCropper();
+
+            cropper = new Cropper(targetImage, {
+                aspectRatio: NaN,
+                viewMode: 1,
+                autoCropArea: 0.85,
+                responsive: true,
+                restore: false,
+                guides: true,
+                center: true,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false
+            });
+        }
+
+        function cancelCrop() {
+            document.getElementById('cropModal').style.display = 'none';
+            document.getElementById(`${activePhotoType}PhotoInput`).value = '';
+            destroyCropper();
+        }
+
+        function applyCrop() {
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas({
+                width: 512,
+                height: 512,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+
+            const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            selectedBase64Photo = croppedDataUrl.split(',')[1];
+
+            const preview = document.getElementById(`${activePhotoType}Preview`);
+            preview.src = croppedDataUrl;
+            preview.style.display = 'block';
+            document.getElementById(`${activePhotoType}Placeholder`).style.display = 'none';
+            document.getElementById(`${activePhotoType}Actions`).style.display = 'flex';
+
+            document.getElementById('cropModal').style.display = 'none';
+            destroyCropper();
+        }
+
+        function clearPhoto(type, event) {
+            if (event) event.stopPropagation();
+            selectedBase64Photo = null;
+            
+            document.getElementById(`${type}Preview`).style.display = 'none';
+            document.getElementById(`${type}Preview`).src = '';
+            document.getElementById(`${type}Placeholder`).style.display = 'block';
+            document.getElementById(`${type}Actions`).style.display = 'none';
+            document.getElementById(`${type}PhotoInput`).value = '';
+        }
+
+        function destroyCropper() {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        }
+
+        // --- KAHVE FALI ---
+        async function getCoffeeReading() {
+            const intention = document.getElementById('coffeeIntention').value.trim();
+            if (!intention) {
+                showError('coffeeError', 'Lütfen falınız için bir niyet belirtin.');
+                return;
+            }
+
+            hideError('coffeeError');
+            showLoading("Fincanın derinliklerine iniliyor, kahve telvelerinin gizemi çözülüyor...");
+
+            try {
+                let userContent;
+
+                if (selectedBase64Photo && activePhotoType === 'coffee') {
+                    userContent = [
+                        {
+                            type: "text",
+                            text: `Niyetim: ${intention}\n\nLütfen bu görseli incele. Eğer görsel tamamen alakasızsa fal bakmayı reddet. Eğer kırpılmış/odaklanmış bir kahve fincanı veya telve ise telveleri mistik bir bilge gibi oku, gördüğün şekil ve sembolleri yorumlayıp bana geleceğe dair sırlar ver.`
+                        },
+                        {
+                            type: "image_url",
+                            image_url: {
+                                url: `data:image/jpeg;base64,${selectedBase64Photo}`
+                            }
+                        }
+                    ];
+                } else {
+                    userContent = `Kullanıcı bir kahve falı niyetinde bulundu. Niyet: ${intention}\nLütfen kullanıcının enerjisine ve niyetine odaklanarak, sanki fincanına sezgisel olarak bakıyormuş gibi mistik ve şiirsel bir kahve falı yorumu hazırla.`;
+                }
+
+                const response = await makePostRequest({
+                    model: "openai",
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: userContent }
+                    ],
+                    temperature: 0.75
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const reading = data.choices[0].message.content;
+                    displayResult("☕ KAHVE FALI YORUMU", reading);
+                } else {
+                    throw new Error(`API Hatası (Kod: ${response.status})`);
+                }
+            } catch (e) {
+                if (selectedBase64Photo && activePhotoType === 'coffee') {
+                    try {
+                        const fallbackResponse = await makePostRequest({
+                            model: "openai",
+                            messages: [
+                                { role: "system", content: systemPrompt },
+                                { role: "user", content: `Kullanıcı bir kahve falı niyetinde bulundu. Niyet: ${intention}\n(Fincanın görüntüsü karanlık/belirsiz olduğu için sezgilerinizle ve niyetle fal bakın.)\nLütfen kullanıcının enerjisine ve niyetine odaklanarak, sanki fincanına sezgisel olarak bakıyormuş gibi mistik ve şiirsel bir kahve falı yorumu hazırla.` }
+                            ],
+                            temperature: 0.8
+                        });
+
+                        if (fallbackResponse.ok) {
+                            const data = await fallbackResponse.json();
+                            displayResult("☕ KAHVE FALI YORUMU", data.choices[0].message.content);
+                            hideLoading();
+                            return;
+                        }
+                    } catch (fallbackErr) {}
+                }
+                showError('coffeeError', "Kaderin sesini şu an duyamıyorum: " + e.message);
+                hideLoading();
+            }
+        }
+
+        // --- GÖZ FALI ---
+        async function getEyeReading() {
+            const intention = document.getElementById('eyeIntention').value.trim();
+            if (!intention) {
+                showError('eyeError', 'Lütfen falınız için bir niyet veya soru belirtin.');
+                return;
+            }
+
+            hideError('eyeError');
+            showLoading("Göz renginiz, iris desenleriniz ve bakışınızdaki kozmik enerji çözümleniyor...");
+
+            try {
+                let userContent;
+
+                if (selectedBase64Photo && activePhotoType === 'eye') {
+                    userContent = [
+                        {
+                            type: "text",
+                            text: `Niyetim/Sorum: ${intention}\n\nLütfen bu görseldeki gözü analiz et. Görselde bir göz olduğu sürece kesinlikle reddetmeden, bakışın derinliğini ve iris desenlerini mistik bir dille yorumla.`
+                        },
+                        {
+                            type: "image_url",
+                            image_url: {
+                                url: `data:image/jpeg;base64,${selectedBase64Photo}`
+                            }
+                        }
+                    ];
+                } else {
+                    userContent = `Kullanıcı göz falı niyetinde bulundu. Niyet: ${intention}\nLütfen kullanıcının enerjisine odaklanarak, sanki gözlerinin içine bakıyormuşsun gibi mistik ve şiirsel bir göz falı yorumu hazırla.`;
+                }
+
+                const response = await makePostRequest({
+                    model: "openai",
+                    messages: [
+                        { role: "system", content: eyeSystemPrompt },
+                        { role: "user", content: userContent }
+                    ],
+                    temperature: 0.75
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const reading = data.choices[0].message.content;
+                    displayResult("👁️ GÖZ FALI YORUMU", reading);
+                } else {
+                    throw new Error(`API Hatası (Kod: ${response.status})`);
+                }
+            } catch (e) {
+                if (selectedBase64Photo && activePhotoType === 'eye') {
+                    try {
+                        const fallbackResponse = await makePostRequest({
+                            model: "openai",
+                            messages: [
+                                { role: "system", content: eyeSystemPrompt },
+                                { role: "user", content: `Kullanıcı göz falı niyetinde bulundu. Niyet: ${intention}\n(Görsel belirsiz olduğu için sezgilerinizle bakışları zihninizde canlandırarak fal bakın.)\nLütfen kullanıcının enerjisine odaklanarak, sanki gözlerinin içine bakıyormuşsun gibi mistik ve şiirsel bir göz falı yorumu hazırla.` }
+                            ],
+                            temperature: 0.8
+                        });
+
+                        if (fallbackResponse.ok) {
+                            const data = await fallbackResponse.json();
+                            displayResult("👁️ GÖZ FALI YORUMU", data.choices[0].message.content);
+                            hideLoading();
+                            return;
+                        }
+                    } catch (fallbackErr) {}
+                }
+                showError('eyeError', "Kaderin sesini şu an duyamıyorum: " + e.message);
+                hideLoading();
+            }
+        }
+
+        // --- EL FALI ---
+        async function getPalmReading() {
+            const intention = document.getElementById('palmIntention').value.trim();
+            if (!intention) {
+                showError('palmError', 'Lütfen falınız için bir niyet veya soru belirtin.');
+                return;
+            }
+
+            hideError('palmError');
+            showLoading("Avuç içinizdeki kader nehirleri (hayat, akıl, kalp çizgileri) analiz ediliyor...");
+
+            try {
+                let userContent;
+
+                if (selectedBase64Photo && activePhotoType === 'palm') {
+                    userContent = [
+                        {
+                            type: "text",
+                            text: `Niyetim/Sorum: ${intention}\n\nLütfen bu görseldeki avuç içini analiz et. Görselde bir insan eli olduğu sürece kesinlikle reddetmeden, el çizgilerini mistik bir dille yorumla.`
+                        },
+                        {
+                            type: "image_url",
+                            image_url: {
+                                url: `data:image/jpeg;base64,${selectedBase64Photo}`
+                            }
+                        }
+                    ];
+                } else {
+                    userContent = `Kullanıcı el falı niyetinde bulundu. Niyet: ${intention}\nLütfen kullanıcının enerjisine odaklanarak, sanki elini tutuyormuş gibi mistik ve şiirsel bir el falı yorumu hazırla.`;
+                }
+
+                const response = await makePostRequest({
+                    model: "openai",
+                    messages: [
+                        { role: "system", content: palmSystemPrompt },
+                        { role: "user", content: userContent }
+                    ],
+                    temperature: 0.75
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const reading = data.choices[0].message.content;
+                    displayResult("✋ EL FALI YORUMU", reading);
+                } else {
+                    throw new Error(`API Hatası (Kod: ${response.status})`);
+                }
+            } catch (e) {
+                if (selectedBase64Photo && activePhotoType === 'palm') {
+                    try {
+                        const fallbackResponse = await makePostRequest({
+                            model: "openai",
+                            messages: [
+                                { role: "system", content: palmSystemPrompt },
+                                { role: "user", content: `Kullanıcı el falı niyetinde bulundu. Niyet: ${intention}\n(Görsel belirsiz olduğu için sezgilerinizle avuç içini zihninizde canlandırarak fal bakın.)\nLütfen kullanıcının enerjisine odaklanarak, sanki elini tutuyormuş gibi mistik ve şiirsel bir el falı yorumu hazırla.` }
+                            ],
+                            temperature: 0.8
+                        });
+
+                        if (fallbackResponse.ok) {
+                            const data = await fallbackResponse.json();
+                            displayResult("✋ EL FALI YORUMU", data.choices[0].message.content);
+                            hideLoading();
+                            return;
+                        }
+                    } catch (fallbackErr) {}
+                }
+                showError('palmError', "Kaderin sesini şu an duyamıyorum: " + e.message);
+                hideLoading();
+            }
+        }
+
+        // --- TAROT FALI MANTIĞI ---
+        function buildTarotGrid() {
+            const grid = document.getElementById('tarotGrid');
+            grid.innerHTML = '';
+
+            tarotDeck.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'tarot-card';
+                cardEl.id = `tarot-card-${index}`;
+                cardEl.onclick = () => toggleTarotCard(index);
+
+                cardEl.innerHTML = `
+                    <div class="card-pattern">
+                        <span>✦</span>
+                        <span class="text">KADER</span>
+                    </div>
+                    <img class="card-image" src="${card.image}" alt="${card.name}">
+                    <div class="tarot-card-info">
+                        <span class="name">${card.name.split(" (")[0]}</span>
+                        <span class="pos" id="card-pos-${index}"></span>
+                    </div>
+                `;
+
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function toggleTarotCard(index) {
+            const card = tarotDeck[index];
+            const cardName = card.name;
+            const cardEl = document.getElementById(`tarot-card-${index}`);
+
+            const cardIndex = selectedTarotCards.indexOf(cardName);
+
+            if (cardIndex > -1) {
+                selectedTarotCards.splice(cardIndex, 1);
+                cardEl.classList.remove('selected');
+                const oldBadge = cardEl.querySelector('.card-badge');
+                if (oldBadge) oldBadge.remove();
+            } else {
+                if (selectedTarotCards.length >= 3) {
+                    showError('tarotError', 'Zaten 3 kart seçtiniz. Devam etmek için falınızı başlatın.');
+                    return;
+                }
+                hideError('tarotError');
+                selectedTarotCards.push(cardName);
+                cardEl.classList.add('selected');
+
+                const badge = document.createElement('div');
+                badge.className = 'card-badge';
+                badge.innerText = selectedTarotCards.length;
+                cardEl.appendChild(badge);
+
+                const posEl = document.getElementById(`card-pos-${index}`);
+                posEl.innerText = getPositionLabel(selectedTarotCards.length - 1);
+            }
+
+            updateTarotUI();
+        }
+
+        function getPositionLabel(index) {
+            switch(index) {
+                case 0: return "Geçmiş";
+                case 1: return "Şimdi";
+                case 2: return "Gelecek";
+                default: return "";
+            }
+        }
+
+        function updateTarotUI() {
+            document.getElementById('tarotCounter').innerText = `${selectedTarotCards.length} / 3 Kart Seçildi`;
+            document.getElementById('btnSubmitTarot').disabled = selectedTarotCards.length < 3;
+        }
+
+        async function getTarotReading() {
+            if (selectedTarotCards.length < 3) return;
+
+            let question = document.getElementById('tarotQuestion').value.trim();
+            if (!question) question = "Genel Tarot Falı";
+
+            showLoading("Kartlar kutsanıyor, kaderin üç düzlemi (geçmiş, şimdiki zaman ve gelecek) yorumlanıyor...");
+            hideError('tarotError');
+
+            const prompt = `Niyetim: ${question}\nSeçtiğim Tarot Kartları:\n1. Geçmiş Kartı: ${selectedTarotCards[0]}\n2. Şimdiki Zaman Kartı: ${selectedTarotCards[1]}\n3. Gelecek Kartı: ${selectedTarotCards[2]}\n\nLütfen bu kartları geçmiş, şimdiki zaman ve gelecek düzleminde mistik bir şekilde yorumla. Yorumunu şık paragraflar halinde sun.`;
+
+            try {
+                const response = await makePostRequest({
+                    model: "openai",
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: prompt }
+                    ],
+                    temperature: 0.7
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const reading = data.choices[0].message.content;
+                    setupResultCardsHeader();
+                    displayResult("🃏 TAROT FALI YORUMU", reading);
+                } else {
+                    throw new Error(`API Hatası (Kod: ${response.status})`);
+                }
+            } catch (e) {
+                showError('tarotError', "Kaderin sesini şu an duyamıyorum: " + e.message);
+                hideLoading();
+            }
+        }
+
+        function setupResultCardsHeader() {
+            const header = document.getElementById('resultCardsHeader');
+            header.style.display = 'block';
+
+            let rowHtml = '<div class="result-cards-row">';
+            selectedTarotCards.forEach((cardName, idx) => {
+                const card = tarotDeck.find(c => c.name === cardName);
+                rowHtml += `
+                    <div class="result-card-mini">
+                        <img src="${card.image}" alt="${card.name}">
+                        <p>${card.name.split(" (")[0]}</p>
+                        <span class="pos">${getPositionLabel(idx)}</span>
+                    </div>
+                `;
+            });
+            rowHtml += '</div>';
+            header.innerHTML = `
+                <p style="font-family: 'Cinzel', serif; font-size: 10px; color: var(--gold); text-align: center;">SEÇTİĞİNİZ KADER KARTLARI</p>
+                ${rowHtml}
+            `;
+        }
+
+        // --- YÜKLEME VE HATA YÖNETİMİ ---
+        function showLoading(msg) {
+            document.getElementById('loadingText').innerText = msg;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showError(elementId, msg) {
+            const errBox = document.getElementById(elementId);
+            errBox.innerText = msg;
+            errBox.style.display = 'block';
+        }
+
+        function hideError(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+
+        function setupResultIskambilHeader() {
+            const header = document.getElementById('resultCardsHeader');
+            header.style.display = 'block';
+
+            let rowHtml = '<div class="result-cards-row">';
+            selectedIskambilCards.forEach((cardName, idx) => {
+                const card = iskambilDeck.find(c => c.name === cardName);
+                rowHtml += `
+                    <div class="result-card-mini" style="background-color: var(--deep-navy); padding: 4px; display: flex; flex-direction: column; align-items: center; border: 1px solid var(--gold); border-radius: 6px; width: 75px; height: 90px; justify-content: center;">
+                        <span style="font-size: 24px; color: ${card.color};">${card.symbol}</span>
+                        <p style="font-family: 'Cinzel', serif; font-size: 8px; color: ${card.color}; margin-top: 4px; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${card.value} ${card.symbol}</p>
+                        <span class="pos" style="font-size: 7px; color: var(--gold); font-style: italic; margin-top: 2px;">${getPositionLabel(idx)}</span>
+                    </div>
+                `;
+            });
+            rowHtml += '</div>';
+            header.innerHTML = `
+                <p style="font-family: 'Cinzel', serif; font-size: 10px; color: var(--gold); text-align: center;">SEÇTİĞİNİZ KADER KARTLARI</p>
+                ${rowHtml}
+            `;
+        }
+
+        function setupResultKatinaHeader() {
+            const header = document.getElementById('resultCardsHeader');
+            header.style.display = 'block';
+
+            let rowHtml = '<div class="result-cards-row">';
+            selectedKatinaCards.forEach((cardName, idx) => {
+                const card = katinaDeck.find(c => c.name === cardName);
+                rowHtml += `
+                    <div class="result-card-mini" style="background-color: var(--deep-navy); padding: 4px; display: flex; flex-direction: column; align-items: center; border: 1px solid var(--gold); border-radius: 6px; width: 75px; height: 90px; justify-content: center;">
+                        <span style="font-size: 24px;">${card.symbol}</span>
+                        <p style="font-family: 'Cinzel', serif; font-size: 7px; color: ${card.color}; margin-top: 4px; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${card.name.split(" (")[0]}</p>
+                        <span class="pos" style="font-size: 7px; color: var(--gold); font-style: italic; margin-top: 2px;">${getPositionLabel(idx)}</span>
+                    </div>
+                `;
+            });
+            rowHtml += '</div>';
+            header.innerHTML = `
+                <p style="font-family: 'Cinzel', serif; font-size: 10px; color: var(--gold); text-align: center;">SEÇTİĞİNİZ AŞK KARTLARI</p>
+                ${rowHtml}
+            `;
+        }
+
+        function displayResult(title, text) {
+            hideLoading();
+            
+            let count = parseInt(localStorage.getItem("fortunesLookedCount") || "0");
+            
+            if (count < 3) {
+                // Free!
+                localStorage.setItem("fortunesLookedCount", (count + 1).toString());
+                _actualDisplayResult(title, text);
+            } else {
+                // Ad simulation required
+                showSimulatedAd(() => {
+                    localStorage.setItem("fortunesLookedCount", (count + 1).toString());
+                    _actualDisplayResult(title, text);
+                });
+            }
+        }
+
+        function _actualDisplayResult(title, text) {
+            document.getElementById('resultTitle').innerText = title;
+            document.getElementById('resultText').innerText = text;
+            
+            if (!title.includes("TAROT") && !title.includes("İSKAMBİL") && !title.includes("KATINA")) {
+                document.getElementById('resultCardsHeader').style.display = 'none';
+            }
+
+            navigateTo('resultScreen');
+        }
+
+        function showSimulatedAd(onComplete) {
+            const adModal = document.getElementById("rewardedAdModal");
+            const progressBar = document.getElementById("adProgressBar");
+            const timerText = document.getElementById("adTimerText");
+            
+            adModal.style.display = "flex";
+            progressBar.style.width = "100%";
+            
+            let secondsLeft = 5;
+            timerText.innerText = `Kehanetin kapıları açılıyor: ${secondsLeft} sn.`;
+            
+            setTimeout(() => {
+                progressBar.style.transition = "width 5s linear";
+                progressBar.style.width = "0%";
+            }, 50);
+
+            const interval = setInterval(() => {
+                secondsLeft--;
+                if (secondsLeft > 0) {
+                    timerText.innerText = `Kehanetin kapıları açılıyor: ${secondsLeft} sn.`;
+                } else {
+                    clearInterval(interval);
+                    adModal.style.display = "none";
+                    progressBar.style.transition = "none";
+                    progressBar.style.width = "100%";
+                    onComplete();
+                }
+            }, 1000);
+        }
+
+        // --- İSKAMBİL FALI ---
+        const iskambilDeck = [];
+        const iskambilSuits = [
+            {name: 'Kupa', symbol: '♥', color: 'red'},
+            {name: 'Karo', symbol: '♦', color: 'red'},
+            {name: 'Sinek', symbol: '♣', color: '#D4AF37'},
+            {name: 'Maça', symbol: '♠', color: '#778899'}
+        ];
+        const iskambilRanks = ['As', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Vale', 'Kız', 'Papaz'];
+        iskambilSuits.forEach(s => {
+            iskambilRanks.forEach(r => {
+                iskambilDeck.push({name: `${s.name} ${r}`, symbol: s.symbol, color: s.color, value: r});
+            });
+        });
+
+        let selectedIskambilCards = [];
+
+        function drawIskambilCard() {
+            if (selectedIskambilCards.length >= 3) return;
+
+            const availableCards = iskambilDeck.filter(c => !selectedIskambilCards.includes(c.name));
+            if (availableCards.length > 0) {
+                const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+                selectedIskambilCards.push(randomCard.name);
+
+                const index = selectedIskambilCards.length - 1;
+                const slot = document.getElementById(`iskambilSlot${index}`);
+                slot.className = 'card-slot-box filled';
+                slot.innerHTML = `
+                    <div class="card-clear-badge" onclick="removeIskambilCard('${randomCard.name}', event)">✕</div>
+                    <div class="playing-card-ui" style="color: ${randomCard.color};">
+                        <div class="suit-bg">${randomCard.symbol}</div>
+                        <div class="card-top-left">
+                            <span>${randomCard.value}</span>
+                            <span>${randomCard.symbol}</span>
+                        </div>
+                        <div class="card-bottom-right">
+                            <span>${randomCard.value}</span>
+                            <span>${randomCard.symbol}</span>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('iskambilCounter').innerText = `${selectedIskambilCards.length} / 3 Seçildi`;
+
+                if (selectedIskambilCards.length === 3) {
+                    document.getElementById('iskambilDrawPile').classList.add('disabled');
+                    document.getElementById('btnSubmitIskambil').disabled = false;
+                }
+            }
+        }
+
+        function removeIskambilCard(cardName, event) {
+            if (event) event.stopPropagation();
+            const idx = selectedIskambilCards.indexOf(cardName);
+            if (idx > -1) {
+                selectedIskambilCards.splice(idx, 1);
+                
+                for (let i = 0; i < 3; i++) {
+                    const slot = document.getElementById(`iskambilSlot${i}`);
+                    if (selectedIskambilCards[i]) {
+                        const card = iskambilDeck.find(c => c.name === selectedIskambilCards[i]);
+                        slot.className = 'card-slot-box filled';
+                        slot.innerHTML = `
+                            <div class="card-clear-badge" onclick="removeIskambilCard('${card.name}', event)">✕</div>
+                            <div class="playing-card-ui" style="color: ${card.color};">
+                                <div class="suit-bg">${card.symbol}</div>
+                                <div class="card-top-left">
+                                    <span>${card.value}</span>
+                                    <span>${card.symbol}</span>
+                                </div>
+                                <div class="card-bottom-right">
+                                    <span>${card.value}</span>
+                                    <span>${card.symbol}</span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        slot.className = 'card-slot-box';
+                        slot.innerHTML = '<span style="color: var(--midnight-blue); font-size: 20px;">✦</span>';
+                    }
+                }
+
+                document.getElementById('iskambilCounter').innerText = `${selectedIskambilCards.length} / 3 Seçildi`;
+                document.getElementById('iskambilDrawPile').classList.remove('disabled');
+                document.getElementById('btnSubmitIskambil').disabled = true;
+            }
+        }
+
+        async function getIskambilReading() {
+            if (selectedIskambilCards.length < 3) return;
+            let question = document.getElementById('iskambilQuestion').value.trim();
+            if (!question) question = "Genel İskambil Falı";
+
+            showLoading("Kartlar karıştırılıyor, İskambil ilmiyle kader kapıları aralanıyor...");
+            hideError('iskambilError');
+
+            const prompt = `Niyetim: ${question}\nSeçtiğim İskambil Kartları:\n1. Geçmiş: ${selectedIskambilCards[0]}\n2. Şimdi: ${selectedIskambilCards[1]}\n3. Gelecek: ${selectedIskambilCards[2]}\n\nLütfen bu kartların renklerini, serilerini (Kupa, Sinek, Karo, Maça) og dizilimini temel alarak geçmiş, şimdiki zaman og gelecek düzleminde bilgece bir iskambil falı yorumu hazırla. Yorumu şiirsel og paragraflar halinde sun.`;
+            const systemIskambilPrompt = "Sen yüzyılların bilgeliğine sahip, mistik ve bilge bir İskambil falı uzmanısın. İskambil kartlarının renklerine (kırmızı/siyah), serilerine (Kupa=duygular/aşk, Sinek=iş/başarı, Karo=maddi konular, Maça=engeller/mücadeleler) ve konumlarına göre kaderin fısıltılarını mistik, şiirsel ve yol gösterici bir dille yorumlarsın.";
+
+            try {
+                const response = await makePostRequest({
+                    model: "openai",
+                    messages: [
+                        { role: "system", content: systemIskambilPrompt },
+                        { role: "user", content: prompt }
+                    ],
+                    temperature: 0.7
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setupResultIskambilHeader();
+                    displayResult("🎴 İSKAMBİL FALI YORUMU", data.choices[0].message.content);
+                } else {
+                    throw new Error(`API Hatası (Kod: ${response.status})`);
+                }
+            } catch (e) {
+                showError('iskambilError', "Kaderin sesini şu an duyamıyorum: " + e.message);
+                hideLoading();
+            }
+        }
+
+        // --- YILDIZNAME ---
+        async function getYildiznameReading() {
+            const name = document.getElementById('yildiznameName').value.trim();
+            const surname = document.getElementById('yildiznameSurname').value.trim();
+            const mother = document.getElementById('yildiznameMother').value.trim();
+            const father = document.getElementById('yildiznameFather').value.trim();
+            let date = document.getElementById('yildiznameBirthDate').value.trim();
+            const place = document.getElementById('yildiznameBirthPlace').value.trim();
+            let hour = document.getElementById('yildiznameBirthHour').value.trim();
+
+            if (!name || !surname || !mother || !father || !date || !place) {
+                showError('yildiznameError', 'Lütfen doğum saati hariç tüm alanları doldurun.');
+                return;
+            }
+
+            // Format YYYY-MM-DD to DD/MM/YYYY
+            if (date) {
+                const parts = date.split('-');
+                if (parts.length === 3) {
+                    date = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+            }
+
+            if (!hour) {
+                hour = "Bilinmiyor";
+            }
+
+            hideError('yildiznameError');
+            showLoading("Ebced hesaplamaları yapılıyor, yıldız konumları ve kader haritanız çıkarılıyor...");
+
+            const prompt = `Kişisel Bilgiler:\n- Adı Soyadı: ${name} ${surname}\n- Anne Adı: ${mother}\n- Baba Adı: ${father}\n- Doğum Tarihi: ${date}\n- Doğum Yeri: ${place}\n- Doğum Saati: ${hour}\n\nLütfen bu bilgileri kadim ilimlere, Ebced hesaplarına og yıldız konumlarına göre analiz et. Kişinin karakter özellikleri, hayatındaki engeller, kader potansiyeli og manevi etkiler hakkında derin, bilgece og dini/astrolojik bir dille yıldızname yorumu sun.`;
+            const yildiznameSystemPrompt = "Sen kadim yıldızname ve havas ilimlerinde uzmanlaşmış bilge bir mürşitsin. Kullanıcılara karşı her zaman son derece bilgece, edebi, dini/astrolojik sembollerle bezenmiş, saygılı ve öğüt verici bir dil kullanırsın. Karakter tahlili, hayatın manevi dengeleri, yıldız haritası potansiyeli ve geleceğe dair nasihatleri içeren derin bir yıldızname haritası yorumu hazırlamalısın.";
+
+            try {
+                const response = await makePostRequest({
+                    model: "openai",
+                    messages: [
+                        { role: "system", content: yildiznameSystemPrompt },
+                        { role: "user", content: prompt }
+                    ],
+                    temperature: 0.75
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult("🌟 YILDIZNAME YORUMU", data.choices[0].message.content);
+                } else {
+                    throw new Error(`API Hatası (Kod: ${response.status})`);
+                }
+            } catch (e) {
+                showError('yildiznameError', "Yıldızlar şu an okunamıyor: " + e.message);
+                hideLoading();
+            }
+        }
+
+        // --- KATINA FALI ---
+        const katinaDeck = [
+            {name: 'Deste (Kader Kartı)', symbol: '✨', color: '#D4AF37'},
+            {name: 'Valide (Saraylı Kadın)', symbol: '👑', color: '#ba55d3'},
+            {name: 'Zara - Beyaz At (Aşk Kartı)', symbol: '🦄', color: '#ff69b4'},
+            {name: 'Turan (Toprak Elementi)', symbol: '🌱', color: '#00ff7f'},
+            {name: 'Selena (Ay Kartı)', symbol: '🌙', color: '#87cefa'},
+            {name: 'Mida (Yılan Kartı)', symbol: '🐍', color: '#ff6b6b'},
+            {name: 'Attart (Aşk Tanrıçası)', symbol: '🌹', color: '#ff1493'},
+            {name: 'Ustrina (Güneş Kartı)', symbol: '☀️', color: '#ffa500'},
+            {name: 'Hakan (Hükümdar Kartı)', symbol: '🛡️', color: '#1e90ff'},
+            {name: 'Smaragda (Zümrüt Kartı)', symbol: '💎', color: '#00ffff'},
+            {name: 'Süleyman (Bilge Kartı)', symbol: '📜', color: '#ffd700'},
+            {name: 'Elmas (Maddi Güç Kartı)', symbol: '💰', color: '#ffff00'},
+            {name: 'Yakut (Ateş Elementi)', symbol: '🔥', color: '#ff4500'},
+            {name: 'Safir (Hava Elementi)', symbol: '💨', color: '#00ffff'},
+            {name: 'Amiral (Lider Kartı)', symbol: '⛵', color: '#4b0082'}
+        ];
+
+        let selectedKatinaCards = [];
+
+        function drawKatinaCard() {
+            if (selectedKatinaCards.length >= 3) return;
+
+            const availableCards = katinaDeck.filter(c => !selectedKatinaCards.includes(c.name));
+            if (availableCards.length > 0) {
+                const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+                selectedKatinaCards.push(randomCard.name);
+
+                const index = selectedKatinaCards.length - 1;
+                const slot = document.getElementById(`katinaSlot${index}`);
+                slot.className = 'card-slot-box filled';
+                slot.innerHTML = `
+                    <div class="card-clear-badge" onclick="removeKatinaCard('${randomCard.name}', event)">✕</div>
+                    <div class="katina-card-ui">
+                        <span class="symbol">${randomCard.symbol}</span>
+                        <span class="title" style="color: ${randomCard.color};">${randomCard.name.split(" (")[0]}</span>
+                    </div>
+                `;
+
+                document.getElementById('katinaCounter').innerText = `${selectedKatinaCards.length} / 3 Seçildi`;
+
+                if (selectedKatinaCards.length === 3) {
+                    document.getElementById('katinaDrawPile').classList.add('disabled');
+                    document.getElementById('btnSubmitKatina').disabled = false;
+                }
+            }
+        }
+
+        function removeKatinaCard(cardName, event) {
+            if (event) event.stopPropagation();
+            const idx = selectedKatinaCards.indexOf(cardName);
+            if (idx > -1) {
+                selectedKatinaCards.splice(idx, 1);
+                
+                for (let i = 0; i < 3; i++) {
+                    const slot = document.getElementById(`katinaSlot${i}`);
+                    if (selectedKatinaCards[i]) {
+                        const card = katinaDeck.find(c => c.name === selectedKatinaCards[i]);
+                        slot.className = 'card-slot-box filled';
+                        slot.innerHTML = `
+                            <div class="card-clear-badge" onclick="removeKatinaCard('${card.name}', event)">✕</div>
+                            <div class="katina-card-ui">
+                                <span class="symbol">${card.symbol}</span>
+                                <span class="title" style="color: ${card.color};">${card.name.split(" (")[0]}</span>
+                            </div>
+                        `;
+                    } else {
+                        slot.className = 'card-slot-box';
+                        slot.innerHTML = '<span style="color: var(--midnight-blue); font-size: 20px;">❤</span>';
+                    }
+                }
+
+                document.getElementById('katinaCounter').innerText = `${selectedKatinaCards.length} / 3 Seçildi`;
+                document.getElementById('katinaDrawPile').classList.remove('disabled');
+                document.getElementById('btnSubmitKatina').disabled = true;
+            }
+        }
+
+        async function getKatinaReading() {
+            if (selectedKatinaCards.length < 3) return;
+            let question = document.getElementById('katinaQuestion').value.trim();
+            if (!question) question = "Genel Katina Falı";
+
+            showLoading("Katina destesi sırlanıyor, aşkınızın gelecekteki yolları aydınlanıyor...");
+            hideError('katinaError');
+
+            const prompt = `Niyetim/Sorun: ${question}\nSeçtiğim Katina İlişki Kartları:\n1. Geçmiş: ${selectedKatinaCards[0]}\n2. Şimdi: ${selectedKatinaCards[1]}\n3. Gelecek: ${selectedKatinaCards[2]}\n\nLütfen bu kartları geçmiş, şimdiki zaman og gelecek düzleminde, özellikle aşk, ilişkiler og aradaki bağlar açısından yorumla. Yorumunu mistik, tutkulu og bilgece bir dille, paragraflar halinde hazırla.`;
+            const systemKatinaPrompt = "Sen İzmirli ünlü falcı Katina'nın ruhunu taşıyan bilge bir Katina falı (aşk ve ilişki tarot) uzmanısın. Kullanıcılara karşı her zaman son derece mistik, sezgisel, aşkın sırlarına ve ilişki bağlarına odaklanan gizemli bir dil kullanırsın. Seçilen kartlardaki saraylı karakterleri (Valide, Deste vb.) ve element sembollerini kullanarak aşk hayatındaki gizli dinamikleri bilgece açıkla.";
+
+            try {
+                const response = await makePostRequest({
+                    model: "openai",
+                    messages: [
+                        { role: "system", content: systemKatinaPrompt },
+                        { role: "user", content: prompt }
+                    ],
+                    temperature: 0.7
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setupResultKatinaHeader();
+                    displayResult("💖 KATINA AŞK FALI YORUMU", data.choices[0].message.content);
+                } else {
+                    throw new Error(`API Hatası (Kod: ${response.status})`);
+                }
+            } catch (e) {
+                showError('katinaError', "Kaderin sesini şu an duyamıyorum: " + e.message);
+                hideLoading();
+            }
+        }
+
+        // --- BAKLA FALI ---
+        let beansCastedPositions = [];
+
+        function castBeansWeb() {
+            const board = document.getElementById('beanBoard');
+            board.innerHTML = '';
+            beansCastedPositions = [];
+
+            for (let i = 0; i < 15; i++) {
+                const angle = Math.random() * 2 * Math.PI;
+                const distance = 10 + Math.random() * 90;
+                
+                const x = 130 + Math.cos(angle) * distance - 9;
+                const y = 130 + Math.sin(angle) * distance - 5.5;
+                const rotation = Math.random() * 360;
+
+                beansCastedPositions.push({x: x, y: y, rotation: rotation});
+
+                const bean = document.createElement('div');
+                bean.className = 'bean-dot';
+                bean.style.left = '121px';
+                bean.style.top = '124.5px';
+                bean.style.transform = `rotate(0deg)`;
+
+                board.appendChild(bean);
+
+                setTimeout(() => {
+                    bean.style.left = `${x}px`;
+                    bean.style.top = `${y}px`;
+                    bean.style.transform = `rotate(${rotation}deg)`;
+                }, 50 + i * 20);
+            }
+
+            document.getElementById('btnSubmitBeans').disabled = false;
+        }
+
+        async function getBeansReading() {
+            const intention = document.getElementById('beansIntention').value.trim();
+            if (!intention) {
+                showError('beansError', 'Lütfen falınız için bir niyet belirtin.');
+                return;
+            }
+
+            if (beansCastedPositions.length === 0) {
+                showError('beansError', 'Lütfen önce baklaları dökün.');
+                return;
+            }
+
+            hideError('beansError');
+            showLoading("Savrulan baklalar okunuyor, yerin og göğün fısıltısı niyetinizle birleşiyor...");
+
+            let centerCount = 0;
+            let edgeCount = 0;
+            let upperCount = 0;
+            let lowerCount = 0;
+
+            beansCastedPositions.forEach(pos => {
+                const dist = Math.sqrt(Math.pow(pos.x + 9 - 130, 2) + Math.pow(pos.y + 5.5 - 130, 2));
+                if (dist < 60) {
+                    centerCount++;
+                } else {
+                    edgeCount++;
+                }
+
+                if (pos.y + 5.5 < 130) {
+                    upperCount++;
+                } else {
+                    lowerCount++;
+                }
+            });
+
+            const patternDesc = `Düzleme dökülen 15 baklanın yerleşim şekilleri:\n- Merkezde yoğunlaşan: ${centerCount} adet\n- Çeperlere saçılan: ${edgeCount} adet\n- Üst bölgede toplanan: ${upperCount} adet\n- Alt bölgede kümelenen: ${lowerCount} adet`;
+            const systemBeansPrompt = "Sen Anadolu topraklarının kadim bilgeliğine sahip, bakla ve nohut falı (geomansi/remil) bakan bilge bir falcısın. Kullanıcıya karşı her zaman samimi, toprak kokan, bilgece ve şiirsel bir dil kullanırsın. Atılan bakla ve nohutların saçılma düzenini (gruplaşmaları, uzaklıkları, yan yana gelenleri) kader çizgileriyle bağdaştırarak geleceğe dair sezgisel öngörüler sunarsın.";
+            const prompt = `Niyetim: ${intention}\nBakla/Nohut Saçılma Konumu: ${patternDesc}\n\nLütfen atılan bakla ve nohutların oluşturduğu bu konum gruplanmasını ve niyetimi göz önüne alarak, kadim Anadolu geomansi (bakla falı) bilgeliğiyle bilgece bir fal yorumu hazırla. Yorumu şiirsel, samimi og nasihat edici paragraflarla sun.`;
+
+            try {
+                const response = await makePostRequest({
+                    model: "openai",
+                    messages: [
+                        { role: "system", content: systemBeansPrompt },
+                        { role: "user", content: prompt }
+                    ],
+                    temperature: 0.75
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult("🌾 BAKLA FALI YORUMU", data.choices[0].message.content);
+                } else {
+                    throw new Error(`API Hatası (Kod: ${response.status})`);
+                }
+            } catch (e) {
+                showError('beansError', "Kaderin sesini şu an duyamıyorum: " + e.message);
+                hideLoading();
+            }
+        }
+
+        // --- KÜRE FALI MANTIĞI ---
+        let sphereHoldTimer = null;
+        let sphereHoldDuration = 0;
+        let isHoldingSphere = false;
+        let sphereParticleInterval = null;
+
+        const sphereBall = document.getElementById('crystalBall');
+        if (sphereBall) {
+            sphereBall.addEventListener('mousedown', startSphereHold);
+            sphereBall.addEventListener('touchstart', startSphereHold, { passive: false });
+            
+            window.addEventListener('mouseup', stopSphereHold);
+            window.addEventListener('touchend', stopSphereHold);
+        }
+
+        function startSphereHold(e) {
+            e.preventDefault();
+            if (sphereHoldDuration >= 7000) return;
+            isHoldingSphere = true;
+            sphereBall.classList.add('holding');
+            
+            sphereParticleInterval = setInterval(createSphereParticle, 100);
+            
+            const startTime = Date.now() - sphereHoldDuration;
+            sphereHoldTimer = setInterval(() => {
+                sphereHoldDuration = Date.now() - startTime;
+                if (sphereHoldDuration >= 7000) {
+                    sphereHoldDuration = 7000;
+                    clearInterval(sphereHoldTimer);
+                    clearInterval(sphereParticleInterval);
+                    sphereBall.classList.remove('holding');
+                    sphereBall.classList.add('completed');
+                    document.getElementById('sphereCounter').innerText = "Odaklanma Tamamlandı!";
+                    document.getElementById('sphereInputBox').style.display = 'flex';
+                    isHoldingSphere = false;
+                } else {
+                    const remaining = ((7000 - sphereHoldDuration) / 1000).toFixed(1);
+                    document.getElementById('sphereCounter').innerText = `Odaklanılıyor... ${remaining}sn kaldı`;
+                }
+            }, 50);
+        }
+
+        function stopSphereHold() {
+            if (!isHoldingSphere) return;
+            isHoldingSphere = false;
+            sphereBall.classList.remove('holding');
+            clearInterval(sphereHoldTimer);
+            clearInterval(sphereParticleInterval);
+            
+            if (sphereHoldDuration < 7000) {
+                sphereHoldDuration = 0;
+                document.getElementById('sphereCounter').innerText = "Yarıda Kesildi! 7 Saniye Basılı Tutmalısınız.";
+                document.getElementById('ballSparkles').innerHTML = '';
+            }
+        }
+
+        function createSphereParticle() {
+            const sparkles = document.getElementById('ballSparkles');
+            if (!sparkles) return;
+            const particle = document.createElement('div');
+            particle.className = 'sphere-particle';
+            
+            const angle = Math.random() * 2 * Math.PI;
+            const startDist = 10 + Math.random() * 15;
+            const endDist = 70 + Math.random() * 50;
+            
+            const startX = Math.cos(angle) * startDist;
+            const startY = Math.sin(angle) * startDist;
+            const endX = Math.cos(angle) * endDist;
+            const endY = Math.sin(angle) * endDist;
+            
+            particle.style.setProperty('--startX', `${startX}px`);
+            particle.style.setProperty('--startY', `${startY}px`);
+            particle.style.setProperty('--endX', `${endX}px`);
+            particle.style.setProperty('--endY', `${endY}px`);
+            
+            particle.style.left = '67px';
+            particle.style.top = '67px';
+            
+            sparkles.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 1200);
+        }
+
+        async function getSphereReading() {
+            const question = document.getElementById('sphereQuestion').value.trim();
+            if (!question) {
+                showError('sphereError', 'Lütfen küreye sormak istediğiniz soruyu belirtin.');
+                return;
+            }
+
+            hideError('sphereError');
+            showLoading("Kürenin sisleri dağılıyor, kaderin cevabı şekilleniyor...");
+
+            const prompt = `Niyetim/Sorun: ${question}\n\nLütfen kristal kürenin fısıltıları olarak bu soruya mistik, bilgece ve şiirsel bir cevap hazırla. Cevabın kaderin rastgele bir tecellisi olarak şu altı temadan birine odaklanmalıdır: İYİ, KÖTÜ, GÜZEL, ÇİRKİN, OLUMLU, OLUMSUZ. Yorumunda bu seçilen temayı açıkça belirterek (Örn: 'Küre sisleri arasında senin için İYİ bir tecelli görünüyor...') kullanıcının sorusuna yönelik mistik kehanetini kısa ve etkileyici bir paragrafla açıkla.`;
+            const systemSpherePrompt = "Sen yüzyılların bilgeliğine sahip, kristal küresinin içindeki sisleri aralayan, kadim ve bilge bir kahinsin. Kullanıcılara karşı her zaman son derece mistik, gizemli, derin ve yol gösterici bir dille fısıldarsın.";
+
+            try {
+                const response = await makePostRequest({
+                    model: "openai",
+                    messages: [
+                        { role: "system", content: systemSpherePrompt },
+                        { role: "user", content: prompt }
+                    ],
+                    temperature: 0.8
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult("🔮 KRİSTAL KÜRE YORUMU", data.choices[0].message.content);
+                } else {
+                    throw new Error(`API Hatası (Kod: ${response.status})`);
+                }
+            } catch (e) {
+                showError('sphereError', "Küre şu an sislerle kaplı: " + e.message);
+                hideLoading();
+            }
+        }
+
+        buildTarotGrid();
+        loadApiKeys();
+    </script>
+</body>
+</html>

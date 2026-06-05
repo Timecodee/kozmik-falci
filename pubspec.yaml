@@ -1,0 +1,45 @@
+name: fal_uygulamasi
+description: "Yapay Zeka Destekli Kahve, Tarot, Yüz ve El Falı Mobil Uygulaması"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^3.1.1
+
+  # HTTP ve API
+  http: ^1.2.1
+  flutter_dotenv: ^5.1.0
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+
+  # UI ve Animasyonlar
+  lottie: ^3.1.2
+  flutter_spinkit: ^5.2.1
+  image_picker: ^1.1.2
+  image_cropper: ^8.0.2 # [NEW] Fotoğrafları kırpmak için
+  google_fonts: ^6.2.1
+
+  # Reklam ve Hafıza
+  google_mobile_ads: ^4.0.0
+  shared_preferences: ^2.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - .env
+    - assets/animations/
