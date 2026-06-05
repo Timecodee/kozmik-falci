@@ -21,7 +21,7 @@ void main() async {
     debugPrint("Hata: .env dosyası yüklenemedi: $e");
   }
 
-  // Firebase başlatma (google-services.json eksik olsa bile uygulamanın çökmesini önlemek için catch-block)
+  // Firebase başlatma
   try {
     await Firebase.initializeApp();
     debugPrint("Firebase başarıyla başlatıldı.");
