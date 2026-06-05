@@ -1,11 +1,7 @@
 name: fal_uygulamasi
 description: "Yapay Zeka Destekli Kahve, Tarot, Yüz ve El Falı Mobil Uygulaması"
-publish_to: 'none'
 
 version: 1.0.0+1
-
-environment:
-  sdk: '>=2.12.0 <100.0.0'
 
 dependencies:
   flutter:
@@ -38,5 +34,4 @@ flutter:
   uses-material-design: true
 
   assets:
-    - .env
     - assets/animations/
