@@ -8,21 +8,21 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-9911718263708562~7358051770"/>
 
-        <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
-
         <activity
-            android:name=".MainActivity"
+            android:name=".main"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
+
+            <meta-data
+                android:name="flutterEmbedding"
+                android:value="2" />
             
             <meta-data
-              android:name="io.flutter.embedding.android.NormalTheme"
+              android:name="io.flutter.embedding.android.NormalThemes"
               android:resource="@style/NormalTheme" />
             
             <intent-filter>

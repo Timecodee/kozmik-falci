@@ -20,15 +20,7 @@ void main() async {
   } catch (e) {
     debugPrint("Hata: .env dosyası yüklenemedi: $e");
   }
-
-  // Firebase başlatma
-  try {
-    await Firebase.initializeApp();
-    debugPrint("Firebase başarıyla başlatıldı.");
-  } catch (e) {
-    debugPrint("Firebase başlatılamadı (Yapılandırma dosyaları eksik olabilir): $e");
-  }
-
+  
   // API Anahtarlarını Uzaktan Yükle
   AiService.initApiKeys();
 
